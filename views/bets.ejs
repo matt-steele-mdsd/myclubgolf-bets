@@ -1,0 +1,51 @@
+<div class="topbar">
+  <span>Signed in as <%= user.DisplayName %></span>
+  <form method="post" action="/auth/logout"><button type="submit">Sign out</button></form>
+</div>
+
+<h2>New bet</h2>
+<form method="post" action="/bets" class="new-bet">
+  <input type="text" name="description" placeholder="What's the bet?" required />
+  <input type="number" name="amount" placeholder="$" step="0.01" min="0" required />
+  <button type="submit">Post bet</button>
+</form>
+
+<h2>Open &amp; recent bets</h2>
+<table>
+  <thead>
+    <tr><th>From</th><th>Bet</th><th>Amount</th><th>Status</th><th>Accepted by</th><th></th></tr>
+  </thead>
+  <tbody>
+    <% bets.forEach(function(bet) { %>
+      <tr>
+        <td><%= bet.RequesterName %></td>
+        <td><%= bet.Description %></td>
+        <td>$<%= bet.Amount %></td>
+        <td><%= bet.Status %></td>
+        <td><%= bet.AccepterName || '—' %></td>
+        <td>
+          <% if (bet.Status === 'open' && bet.RequesterBetUserID !== user.BetUserID) { %>
+            <form method="post" action="/bets/<%= bet.BetID %>/accept">
+              <button type="submit">Accept</button>
+            </form>
+          <% } %>
+          <% if (bet.Status === 'open' && bet.RequesterBetUserID === user.BetUserID) { %>
+            <form method="post" action="/bets/<%= bet.BetID %>/cancel">
+              <button type="submit">Cancel</button>
+            </form>
+          <% } %>
+          <% if (bet.Status === 'accepted') { %>
+            <form method="post" action="/bets/<%= bet.BetID %>/settle" class="settle">
+              <select name="winner">
+                <option value="requester">Requester won</option>
+                <option value="accepter">Accepter won</option>
+                <option value="push">Push</option>
+              </select>
+              <button type="submit">Settle</button>
+            </form>
+          <% } %>
+        </td>
+      </tr>
+    <% }); %>
+  </tbody>
+</table>

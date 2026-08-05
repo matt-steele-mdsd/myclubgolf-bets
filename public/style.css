@@ -1,0 +1,20 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  color: #1a1a1a;
+}
+header h1 { font-size: 1.25rem; }
+header h1 a { color: inherit; text-decoration: none; }
+table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #ddd; }
+form { margin: 0.25rem 0; }
+input, select, button { padding: 0.4rem; font-size: 1rem; }
+.topbar { display: flex; justify-content: space-between; align-items: center; }
+.new-bet { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+@media (prefers-color-scheme: dark) {
+  body { background: #111; color: #eee; }
+  th, td { border-color: #333; }
+}
