@@ -1,51 +1,80 @@
 <div class="topbar">
-  <span>Signed in as <%= user.DisplayName %></span>
-  <form method="post" action="/auth/logout"><button type="submit">Sign out</button></form>
+  <span>Signed in as <strong><%= user.DisplayName %></strong></span>
+  <span>
+    <% if (isAdmin) { %>
+      <a href="/admin/approvals" class="link-button">Approvals<% if (pendingCount > 0) { %> (<%= pendingCount %>)<% } %></a> ·
+    <% } %>
+    <form method="post" action="/auth/logout" style="display:inline"><button type="submit" class="link-button">Sign out</button></form>
+  </span>
 </div>
 
-<h2>New bet</h2>
-<form method="post" action="/bets" class="new-bet">
-  <input type="text" name="description" placeholder="What's the bet?" required />
-  <input type="number" name="amount" placeholder="$" step="0.01" min="0" required />
-  <button type="submit">Post bet</button>
-</form>
+<nav class="session-tabs">
+  <a class="session-tab <%= activeSession === 'overall' ? 'active' : '' %>" href="/bets?session=overall">Overall Winner</a>
+  <% sessions.forEach(function(s) { %>
+    <a class="session-tab <%= activeSession === String(s.SessionID) ? 'active' : '' %>" href="/bets?session=<%= s.SessionID %>"><%= s.Name %></a>
+  <% }); %>
+</nav>
 
-<h2>Open &amp; recent bets</h2>
-<table>
-  <thead>
-    <tr><th>From</th><th>Bet</th><th>Amount</th><th>Status</th><th>Accepted by</th><th></th></tr>
-  </thead>
-  <tbody>
-    <% bets.forEach(function(bet) { %>
-      <tr>
-        <td><%= bet.RequesterName %></td>
-        <td><%= bet.Description %></td>
-        <td>$<%= bet.Amount %></td>
-        <td><%= bet.Status %></td>
-        <td><%= bet.AccepterName || '—' %></td>
-        <td>
-          <% if (bet.Status === 'open' && bet.RequesterBetUserID !== user.BetUserID) { %>
-            <form method="post" action="/bets/<%= bet.BetID %>/accept">
-              <button type="submit">Accept</button>
-            </form>
-          <% } %>
-          <% if (bet.Status === 'open' && bet.RequesterBetUserID === user.BetUserID) { %>
-            <form method="post" action="/bets/<%= bet.BetID %>/cancel">
-              <button type="submit">Cancel</button>
-            </form>
-          <% } %>
-          <% if (bet.Status === 'accepted') { %>
-            <form method="post" action="/bets/<%= bet.BetID %>/settle" class="settle">
-              <select name="winner">
-                <option value="requester">Requester won</option>
-                <option value="accepter">Accepter won</option>
-                <option value="push">Push</option>
-              </select>
-              <button type="submit">Settle</button>
-            </form>
-          <% } %>
-        </td>
-      </tr>
-    <% }); %>
-  </tbody>
-</table>
+<section class="card">
+  <h2>New bet</h2>
+  <form method="post" action="/bets" class="new-bet" id="new-bet-form">
+    <input type="hidden" name="session" value="<%= activeSession %>" />
+
+    <% if (activeSession !== 'overall') { %>
+      <% if (matches.length === 0) { %>
+        <p class="empty-note">No open matches in this session — pairings may not be set yet, or every match already has a result.</p>
+      <% } else { %>
+        <label class="field-label" for="matchId">Match</label>
+        <select name="matchId" id="matchId">
+          <% matches.forEach(function(m) { %>
+            <option value="<%= m.MatchID %>">
+              <%= m.UsaPlayers || 'TBD' %> (USA) vs <%= m.EuroPlayers || 'TBD' %> (Europe)
+            </option>
+          <% }); %>
+        </select>
+      <% } %>
+    <% } %>
+
+    <label class="field-label">Who wins?</label>
+    <div class="segmented" role="radiogroup" aria-label="Picked team">
+      <label class="segmented-option">
+        <input type="radio" name="pickedTeam" value="U" checked />
+        <span>Team USA</span>
+      </label>
+      <label class="segmented-option">
+        <input type="radio" name="pickedTeam" value="E" />
+        <span>Team Europe</span>
+      </label>
+    </div>
+
+    <label class="field-label" for="amount">Amount</label>
+    <input type="number" name="amount" id="amount" placeholder="$" step="0.01" min="0" required />
+
+    <button type="submit" class="primary-button" <% if (activeSession !== 'overall' && matches.length === 0) { %>disabled<% } %>>Post bet</button>
+  </form>
+</section>
+
+<%
+  var openBets = bets.filter(function(b) { return b.Status === 'open' && b.RequesterBetUserID !== user.BetUserID; });
+  var myBets = bets.filter(function(b) { return b.RequesterBetUserID === user.BetUserID || b.AccepterBetUserID === user.BetUserID; });
+%>
+
+<h2>Open bets</h2>
+<% if (openBets.length === 0) { %>
+  <p class="empty-note">No open bets to accept in this <%= activeSession === 'overall' ? 'category' : 'session' %> right now.</p>
+<% } %>
+<div class="bet-list">
+  <% openBets.forEach(function(bet) { %>
+    <%- include('_bet-card', { bet: bet, user: user, activeSession: activeSession }) %>
+  <% }); %>
+</div>
+
+<h2>My bets</h2>
+<% if (myBets.length === 0) { %>
+  <p class="empty-note">You haven't posted or accepted a bet in this <%= activeSession === 'overall' ? 'category' : 'session' %> yet.</p>
+<% } %>
+<div class="bet-list">
+  <% myBets.forEach(function(bet) { %>
+    <%- include('_bet-card', { bet: bet, user: user, activeSession: activeSession }) %>
+  <% }); %>
+</div>

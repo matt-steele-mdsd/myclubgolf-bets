@@ -1,0 +1,48 @@
+<div class="bet-card status-<%= bet.Status %>">
+  <div class="bet-card-header">
+    <span class="bet-amount">$<%= bet.Amount %></span>
+    <span class="bet-status"><%= bet.Status %></span>
+  </div>
+  <p class="bet-description"><%= bet.Description %></p>
+  <p class="bet-meta">
+    <%= bet.RequesterName %><% if (bet.AccepterName) { %> vs <%= bet.AccepterName %><% } %>
+  </p>
+  <% if (bet.BetType === 'match' && bet.MatchResultText) { %>
+    <p class="bet-result">Result: <%= bet.MatchWinner === 'U' ? 'USA' : (bet.MatchWinner === 'E' ? 'Europe' : 'Halved') %> — <%= bet.MatchResultText %></p>
+  <% } %>
+  <% if (bet.Winner) { %>
+    <p class="bet-result">Settled: <%= bet.Winner === 'push' ? 'Push' : (bet.Winner + ' won') %></p>
+  <% } %>
+
+  <div class="bet-actions">
+    <% if (bet.Status === 'open' && bet.RequesterBetUserID !== user.BetUserID) { %>
+      <form method="post" action="/bets/<%= bet.BetID %>/accept?session=<%= activeSession %>">
+        <button type="submit" class="secondary-button">Accept</button>
+      </form>
+    <% } %>
+    <% if (bet.Status === 'open' && bet.RequesterBetUserID === user.BetUserID) { %>
+      <form method="post" action="/bets/<%= bet.BetID %>/cancel?session=<%= activeSession %>">
+        <button type="submit" class="link-button">Cancel</button>
+      </form>
+    <% } %>
+    <% if (bet.Status === 'accepted' && bet.BetType === 'overall') { %>
+      <form method="post" action="/bets/<%= bet.BetID %>/settle?session=<%= activeSession %>" class="settle">
+        <select name="winner">
+          <option value="requester">Requester won</option>
+          <option value="accepter">Accepter won</option>
+          <option value="push">Push</option>
+        </select>
+        <button type="submit" class="secondary-button">Settle</button>
+      </form>
+    <% } %>
+    <% if (bet.Status === 'accepted' && bet.BetType === 'match') { %>
+      <% if (bet.MatchWinner) { %>
+        <form method="post" action="/bets/<%= bet.BetID %>/settle?session=<%= activeSession %>">
+          <button type="submit" class="secondary-button">Confirm settlement</button>
+        </form>
+      <% } else { %>
+        <span class="empty-note">Waiting for the match result to be posted</span>
+      <% } %>
+    <% } %>
+  </div>
+</div>

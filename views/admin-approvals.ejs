@@ -1,0 +1,24 @@
+<div class="topbar">
+  <a href="/bets" class="link-button">&larr; Back to Bets</a>
+</div>
+
+<h2>Pending approvals</h2>
+<% if (pending.length === 0) { %>
+  <p class="empty-note">No pending sign-ups right now.</p>
+<% } %>
+<div class="bet-list">
+  <% pending.forEach(function(p) { %>
+    <div class="bet-card">
+      <p class="bet-description"><strong><%= p.DisplayName %></strong></p>
+      <p class="bet-meta"><%= p.Email %></p>
+      <div class="bet-actions">
+        <form method="post" action="/admin/approvals/<%= p.BetUserID %>/approve">
+          <button type="submit" class="secondary-button">Approve</button>
+        </form>
+        <form method="post" action="/admin/approvals/<%= p.BetUserID %>/reject" onsubmit="return confirm('Reject this sign-up?');">
+          <button type="submit" class="link-button">Reject</button>
+        </form>
+      </div>
+    </div>
+  <% }); %>
+</div>

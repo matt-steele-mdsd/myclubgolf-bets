@@ -1,0 +1,14 @@
+<section class="card">
+  <h2>Sign up to bet</h2>
+  <p>Enter your name and email. A club admin will review and approve you, then you'll get an email to sign in.</p>
+  <form method="post" action="/signup">
+    <label class="field-label" for="firstName">First name</label>
+    <input type="text" name="firstName" id="firstName" required />
+    <label class="field-label" for="lastName">Last name</label>
+    <input type="text" name="lastName" id="lastName" required />
+    <label class="field-label" for="email">Email</label>
+    <input type="email" name="email" id="email" placeholder="you@example.com" required />
+    <button type="submit" class="primary-button">Sign up</button>
+  </form>
+</section>
+<p><a href="/login">Already approved? Sign in</a></p>

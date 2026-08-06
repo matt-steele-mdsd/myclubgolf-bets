@@ -1,6 +1,9 @@
-<h2>Sign in</h2>
-<p>Enter your email and we'll send you a sign-in link. Only emails already on the club roster can sign in.</p>
-<form method="post" action="/auth/request-link">
-  <input type="email" name="email" placeholder="you@example.com" required />
-  <button type="submit">Send link</button>
-</form>
+<section class="card">
+  <h2>Sign in</h2>
+  <p>Enter your email and we'll send you a sign-in link. Only approved emails can sign in.</p>
+  <form method="post" action="/auth/request-link">
+    <input type="email" name="email" placeholder="you@example.com" required />
+    <button type="submit" class="primary-button">Send link</button>
+  </form>
+</section>
+<p><a href="/signup">Not signed up yet? Sign up to bet</a></p>
