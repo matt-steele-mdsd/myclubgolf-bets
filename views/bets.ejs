@@ -63,6 +63,16 @@
   });
 %>
 
+<h2>My bets</h2>
+<% if (myBets.length === 0) { %>
+  <p class="empty-note">You haven't posted or accepted a bet in this <%= activeSession === 'overall' ? 'category' : 'session' %> yet.</p>
+<% } %>
+<div class="bet-list">
+  <% myBets.forEach(function(bet) { %>
+    <%- include('_bet-card', { bet: bet, user: user, activeSession: activeSession, readOnly: false }) %>
+  <% }); %>
+</div>
+
 <h2>Open bets</h2>
 <% if (openBets.length === 0) { %>
   <p class="empty-note">No open bets to accept in this <%= activeSession === 'overall' ? 'category' : 'session' %> right now.</p>
@@ -80,15 +90,5 @@
 <div class="bet-list">
   <% acceptedBets.forEach(function(bet) { %>
     <%- include('_bet-card', { bet: bet, user: user, activeSession: activeSession, readOnly: true }) %>
-  <% }); %>
-</div>
-
-<h2>My bets</h2>
-<% if (myBets.length === 0) { %>
-  <p class="empty-note">You haven't posted or accepted a bet in this <%= activeSession === 'overall' ? 'category' : 'session' %> yet.</p>
-<% } %>
-<div class="bet-list">
-  <% myBets.forEach(function(bet) { %>
-    <%- include('_bet-card', { bet: bet, user: user, activeSession: activeSession, readOnly: false }) %>
   <% }); %>
 </div>
