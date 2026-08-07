@@ -44,6 +44,17 @@ export async function sendApprovedEmail(toEmail: string): Promise<void> {
   });
 }
 
+export async function sendNewSignupEmail(toEmail: string, displayName: string, signupEmail: string): Promise<void> {
+  const approvalsUrl = `${process.env.APP_BASE_URL}/admin/approvals`;
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM,
+    to: toEmail,
+    subject: `New sign-up pending: ${displayName}`,
+    text: `${displayName} (${signupEmail}) signed up for RyderCup Bets and is waiting for approval.\n\nApprove or reject: ${approvalsUrl}`,
+    html: `<p><strong>${displayName}</strong> (${signupEmail}) signed up for RyderCup Bets and is waiting for approval.</p><p><a href="${approvalsUrl}">Approve or reject</a></p>`,
+  });
+}
+
 export async function sendBetSettledEmail(
   toEmail: string,
   description: string,

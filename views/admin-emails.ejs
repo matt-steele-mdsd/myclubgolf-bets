@@ -1,0 +1,16 @@
+<div class="topbar">
+  <a href="/bets" class="link-button">&larr; Back to Bets</a>
+</div>
+
+<h2>Approved emails (<%= approved.length %>)</h2>
+<% if (approved.length === 0) { %>
+  <p class="empty-note">No approved users yet.</p>
+<% } %>
+<div class="bet-list">
+  <% approved.forEach(function(u) { %>
+    <div class="bet-card">
+      <p class="bet-description"><strong><%= u.DisplayName %></strong></p>
+      <p class="bet-meta"><%= u.Email %></p>
+    </div>
+  <% }); %>
+</div>

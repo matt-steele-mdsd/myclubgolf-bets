@@ -5,13 +5,15 @@ import expressLayouts from 'express-ejs-layouts';
 import path from 'path';
 import { requestMagicLink, verifyMagicLink, verifySessionCookie } from './services/authService';
 import { acceptBet, BetScope, cancelBet, createBet, listBets, settleBet } from './services/betService';
-import { sendApprovedEmail } from './services/emailService';
+import { sendApprovedEmail, sendNewSignupEmail } from './services/emailService';
 import { listBettableMatches, listSessions } from './services/matchService';
 import {
   approveUser,
   BetUser,
   getUserById,
   isAdminEmail,
+  listAdminEmails,
+  listApprovedUsers,
   listPendingUsers,
   registerPendingUser,
   rejectUser,
@@ -98,6 +100,12 @@ app.post(
     const lastName = String(req.body.lastName ?? '');
     const email = String(req.body.email ?? '');
     await registerPendingUser(firstName, lastName, email);
+    const displayName = `${firstName.trim()} ${lastName.trim()}`.trim();
+    try {
+      await Promise.all(listAdminEmails().map((adminEmail) => sendNewSignupEmail(adminEmail, displayName, email.trim())));
+    } catch (err) {
+      console.error(`Failed to send new-signup notification for ${email}:`, err);
+    }
     res.render('signup-thanks', { title: 'Thanks!' });
   })
 );
@@ -109,6 +117,16 @@ app.get(
   asyncHandler(async (_req, res) => {
     const pending = await listPendingUsers();
     res.render('admin-approvals', { title: 'Pending Approvals', pending });
+  })
+);
+
+app.get(
+  '/admin/emails',
+  requireAuth,
+  requireAdmin,
+  asyncHandler(async (_req, res) => {
+    const approved = await listApprovedUsers();
+    res.render('admin-emails', { title: 'Email List', approved });
   })
 );
 

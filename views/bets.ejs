@@ -3,6 +3,7 @@
   <span>
     <% if (isAdmin) { %>
       <a href="/admin/approvals" class="link-button">Approvals<% if (pendingCount > 0) { %> (<%= pendingCount %>)<% } %></a> ·
+      <a href="/admin/emails" class="link-button">Email List</a> ·
     <% } %>
     <form method="post" action="/auth/logout" style="display:inline"><button type="submit" class="link-button">Sign out</button></form>
   </span>
@@ -57,6 +58,9 @@
 <%
   var openBets = bets.filter(function(b) { return b.Status === 'open' && b.RequesterBetUserID !== user.BetUserID; });
   var myBets = bets.filter(function(b) { return b.RequesterBetUserID === user.BetUserID || b.AccepterBetUserID === user.BetUserID; });
+  var acceptedBets = bets.filter(function(b) {
+    return b.Status === 'accepted' && b.RequesterBetUserID !== user.BetUserID && b.AccepterBetUserID !== user.BetUserID;
+  });
 %>
 
 <h2>Open bets</h2>
@@ -65,7 +69,17 @@
 <% } %>
 <div class="bet-list">
   <% openBets.forEach(function(bet) { %>
-    <%- include('_bet-card', { bet: bet, user: user, activeSession: activeSession }) %>
+    <%- include('_bet-card', { bet: bet, user: user, activeSession: activeSession, readOnly: false }) %>
+  <% }); %>
+</div>
+
+<h2>Accepted bets</h2>
+<% if (acceptedBets.length === 0) { %>
+  <p class="empty-note">No other accepted bets in this <%= activeSession === 'overall' ? 'category' : 'session' %> right now.</p>
+<% } %>
+<div class="bet-list">
+  <% acceptedBets.forEach(function(bet) { %>
+    <%- include('_bet-card', { bet: bet, user: user, activeSession: activeSession, readOnly: true }) %>
   <% }); %>
 </div>
 
@@ -75,6 +89,6 @@
 <% } %>
 <div class="bet-list">
   <% myBets.forEach(function(bet) { %>
-    <%- include('_bet-card', { bet: bet, user: user, activeSession: activeSession }) %>
+    <%- include('_bet-card', { bet: bet, user: user, activeSession: activeSession, readOnly: false }) %>
   <% }); %>
 </div>

@@ -24,12 +24,22 @@ export async function getUserById(id: number): Promise<BetUser | null> {
 // Comma-separated allowlist of emails that can approve/reject signups. Reused as an env var
 // (like RYDER_GROUP_ID/RYDER_YEAR) rather than a DB flag, since bootstrapping the first admin
 // via a DB column would need the same manual-seed step this whole feature exists to avoid.
-export function isAdminEmail(email: string): boolean {
-  const admins = (process.env.ADMIN_EMAILS ?? '')
+function adminEmailList(): string[] {
+  return (process.env.ADMIN_EMAILS ?? '')
     .split(',')
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean);
-  return admins.includes(email.trim().toLowerCase());
+}
+
+export function isAdminEmail(email: string): boolean {
+  return adminEmailList().includes(email.trim().toLowerCase());
+}
+
+// Every admin address to notify when something needs their attention (e.g. a new pending
+// sign-up) -- same allowlist isAdminEmail checks against, just returned as a list instead of
+// a membership test.
+export function listAdminEmails(): string[] {
+  return adminEmailList();
 }
 
 // Self-service signup: creates (or refreshes the name on) a BetUser row with Active = 0 --
@@ -49,6 +59,10 @@ export async function registerPendingUser(firstName: string, lastName: string, e
 
 export async function listPendingUsers(): Promise<BetUser[]> {
   return query<BetUser[]>('SELECT * FROM BetUser WHERE Active = 0 ORDER BY CreatedDt');
+}
+
+export async function listApprovedUsers(): Promise<BetUser[]> {
+  return query<BetUser[]>('SELECT * FROM BetUser WHERE Active = 1 ORDER BY DisplayName');
 }
 
 export async function approveUser(id: number): Promise<BetUser | null> {

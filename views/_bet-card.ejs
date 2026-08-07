@@ -14,6 +14,7 @@
     <p class="bet-result">Settled: <%= bet.Winner === 'push' ? 'Push' : (bet.Winner + ' won') %></p>
   <% } %>
 
+  <% if (!readOnly) { %>
   <div class="bet-actions">
     <% if (bet.Status === 'open' && bet.RequesterBetUserID !== user.BetUserID) { %>
       <form method="post" action="/bets/<%= bet.BetID %>/accept?session=<%= activeSession %>">
@@ -45,4 +46,5 @@
       <% } %>
     <% } %>
   </div>
+  <% } %>
 </div>
