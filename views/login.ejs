@@ -1,9 +1,14 @@
 <section class="card">
-  <h2>Sign in</h2>
-  <p>Enter your email and we'll send you a sign-in link. Only approved emails can sign in.</p>
+  <h2>New here?</h2>
+  <p>If you haven't been approved yet, sign up first — an admin will approve you, then you can sign in below.</p>
+  <a href="/signup" class="primary-button" style="display:block; text-align:center; text-decoration:none;">Sign up to bet</a>
+</section>
+
+<section class="card" style="margin-top: 1rem;">
+  <h2>Already approved? Sign in</h2>
+  <p>Enter your email and we'll send you a sign-in link.</p>
   <form method="post" action="/auth/request-link">
     <input type="email" name="email" placeholder="you@example.com" required />
-    <button type="submit" class="primary-button">Send link</button>
+    <button type="submit" class="secondary-button" style="width:100%; margin-top:0.75rem; padding:0.75rem;">Send link</button>
   </form>
 </section>
-<p><a href="/signup">Not signed up yet? Sign up to bet</a></p>
